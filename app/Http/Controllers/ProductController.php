@@ -15,11 +15,12 @@ class ProductController extends Controller
     public function index()
     {
         try {
-            $product = Product::all();
+            // n+1 problem solution
+            $products = Product::with('category')->get();
 
             return response()->json([
                 "message" => "Product list retrieved successfully",
-                "data"    => ProductResource::collection($product),
+                "data"    => ProductResource::collection($products),
             ], 200);
 
         } catch (Exception $e) {
