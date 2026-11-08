@@ -1,0 +1,22 @@
+Database (Postgres)
+       |
+migration(table)
+       |
+model(handle table data)
+       |
+controller(contact model and view  )
+       |
+     routes
+       |
+REST API (JSON Response)
+
+
+Database -> Basic Operation
+CRUD -> Create,Read,Update,Delete
+
+
+php artisan make:resource PostResource
+php artisan make:request PostStoreRequest
+
+
+php artisan make:controller ProductController --api
