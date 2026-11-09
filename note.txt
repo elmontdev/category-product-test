@@ -20,3 +20,15 @@ php artisan make:request PostStoreRequest
 
 
 php artisan make:controller ProductController --api
+-----------------------------------------
+path Parmater
+Route -> /api/products/{id}
+
+Query Parmeter
+Route -> /api/products?name=AungAung
+
+Optional Parameter
+Route -> /api/products/{id?}
+
+category data -> 11 -> 5,5,1
+per Page -> 5

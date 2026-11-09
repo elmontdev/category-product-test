@@ -6,21 +6,44 @@ use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Exception;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
             // n+1 problem solution
-            $products = Product::with('category')->get();
+            // $products = Product::with('category')->get();
+            $query = Product::query()->with("category");
+
+            //searching
+            $query->when($request->get("search"), function ($q) use ($request) {
+                $searchKey = $request["search"];
+                $q->where(function ($subQuery) use ($searchKey) {
+                    $subQuery->where("name", "like", "%" . $searchKey . "%")
+                        ->orWhere("description", "like", "%" . $searchKey . "%")
+                        ->orWhere("price", "like", "%" . $searchKey . "%")
+                        ->orWhereHas("category", function ($categoryQuery) use ($searchKey) {
+                            $categoryQuery->where("name", "like", "%" . $searchKey . "%");
+                        });
+                });
+            });
+
+            //pagination
+            $perPage  = $request->get("per_page", 10);
+            $products = $query->paginate($perPage);
 
             return response()->json([
-                "message" => "Product list retrieved successfully",
-                "data"    => ProductResource::collection($products),
+                "message"      => "Product list retrieved successfully",
+                "data"         => ProductResource::collection($products),
+                "total"        => $products->total(),
+                "per_page"     => $products->perPage(),
+                "current_page" => $products->currentPage(),
+                "last_page"    => $products->lastPage(),
             ], 200);
 
         } catch (Exception $e) {
